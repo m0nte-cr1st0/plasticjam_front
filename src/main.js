@@ -1,8 +1,15 @@
 import Vue from 'vue'
-import App from './App.vue'
+import App from './App'
+import router from './router'
+import VueAxios from './plugins/axios'
+import VueResource from 'vue-resource';
 
-Vue.config.productionTip = false
+Vue.use(VueResource)
+Vue.use(VueAxios)
 
 new Vue({
-  render: h => h(App),
-}).$mount('#app')
+  el: '#app',
+  router,
+  components: { App },
+  template: '<App/>'
+})
