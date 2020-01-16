@@ -27,9 +27,9 @@ export default {
     mounted() {
         let id = this.$route.params.id;
         this.$axios
-            .get('http://127.0.0.1:8000/api/v1/users/'+id)
+            .get('http://127.0.0.1:8000/api/v1/users/'+id+'/')
             .then(response => {
-              this.user = response.data
+              this.user=response.data
         })
     },
     methods: {

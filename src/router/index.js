@@ -12,6 +12,7 @@ axios.defaults.xsrfCookieName = "csrftoken";
 
 export default new Router({
   mode: 'history',
+  basename: 'users',
   routes: [
     {
       path: '/users/',
