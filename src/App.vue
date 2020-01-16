@@ -5,11 +5,11 @@
 </template>
 
 <script>
-
-
-
 export default {
   name: 'App',
+  created () {
+    document.title = "PlasticJam - Test";
+  }
 }
 </script>
 

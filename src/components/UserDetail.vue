@@ -1,21 +1,24 @@
 <template>
-  <div>
-    <div>
-        From: <input type="date" id="start" name="trip-start"
-           v-model="start_date">
-    </div>
-    <div>
-        To: <input type="date" id="end" name="trip-end"
-           v-model="end_date">
-    </div>
-    <button type="button" @click="getStatistics()">Get statistics</button>
-    <div v-for="user in data.user_data" :key="user.id">
-        <p>{{ user }}</p>
-    </div>
-    <table>
+  <div class="container-fluid">
+    <b-row>
+      <b-form-group class="col-md-9">
+        <div class="col-md-3">
+            From: <input type="date" id="start" name="trip-start"
+               v-model="start_date">
+        </div>
+        <div class="col-md-3">
+            To: <input type="date" id="end" name="trip-end"
+               v-model="end_date">
+        </div>
+        <b-col class="col-md-3 button" @click="getStatistics()"><b-button>Get statistics</b-button></b-col>
+      </b-form-group>
+      <b-form-group class="to-home">
+        <router-link :to="{name:'users-list'}">Home page</router-link>
+      </b-form-group>
+    </b-row>
 
-    </table>
-    <b-table-simple sticky-header hover small caption-top responsive class="text-center">
+    <b-table-simple hover small caption-top responsive class="text-center">
+      <caption>{{ user.first_name }} {{ user.last_name }} statistic:</caption>
       <b-thead head-variant="dark">
           <b-tr>
             <b-th>Date</b-th>
@@ -23,7 +26,7 @@
             <b-th>Page views</b-th>
           </b-tr>
       </b-thead>
-      <tr v-for="stat in data.statistics" :key="stat.id">
+      <tr v-for="stat in data.results" :key="stat.id">
         <td>{{ stat.date }}</td>
         <td>{{ stat.clicks }}</td>
         <td>{{ stat.page_views }}</td>
@@ -37,34 +40,43 @@ export default {
     name: 'UserDetail',
     data() {
         return {
+          user: '',
           data: {},
           start_date: '',
           end_date: ''
         }
     },
+    created () {
+      document.title = 'Detail statistic page';
+    },
     mounted() {
         let id = this.$route.params.id;
         this.$axios
-            .get('http://127.0.0.1:8000/api/v1/users/'+id+'/')
+            .get(id+'/', {
+              params: {
+               'user_pk': id
+              }
+            })
             .then(response => {
-              console.log(response.data),
-              this.data=response.data,
-              this.start_date=response.data.dates_rang[0],
-              this.end_date=response.data.dates_rang[1]
+              this.data = response.data,
+              this.user = response.data.results[0].user,
+              this.start_date = response.data.results.min_date,
+              this.end_date = response.data.results.max_date
         })
     },
     methods: {
         getStatistics() {
           let id = this.$route.params.id;
           this.$axios
-            .get('http://127.0.0.1:8000/api/v1/users/'+id+'/', {
+            .get(id+'/', {
               params: {
+               'user_pk': id,
                'start_date': this.start_date,
                'end_date': this.end_date
               }
             })
             .then(response => (
-              this.data=response.data
+              this.data = response.data
             ));
         }
     }
@@ -72,5 +84,10 @@ export default {
 </script>
 
 <style scoped>
-
+.col-md-3 {
+  margin: 10px auto
+}
+.to-home {
+  margin: auto
+}
 </style>

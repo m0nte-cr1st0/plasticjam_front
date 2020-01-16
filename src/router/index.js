@@ -15,8 +15,8 @@ export default new Router({
   basename: 'users',
   routes: [
     {
-      path: '/users/',
-      name: 'UsersList',
+      path: '',
+      name: 'users-list',
       component: UsersList
     },
     {
