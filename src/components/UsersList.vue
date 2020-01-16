@@ -1,11 +1,34 @@
 <template>
   <div>
+    <b-pagination
+      v-model="pageNumber"
+      :total-rows="rows"
+      :per-page="perPage"
+    ></b-pagination>
     <button type="button" @click="getUsers(-1)">Prev</button>
     <button type="button" @click="getUsers(+1)">Next</button>
+    <b-row class="my-1" v-for="type in types" :key="type">
+      <b-col sm="4">
+        <b-form-input :id="`type-${number}`" :type="number"></b-form-input>
+      </b-col>
+    </b-row>
     <input type="number" max="50" v-model="countUsers" placeholder="Count of users">
     <input type="number" max="50" v-model="pageNumber" placeholder="Number of page">
     <button type="button" @click="getUsersInput()">Submit</button>
-    <table>
+    <b-table-simple sticky-header="768px" hover small caption-top responsive class="text-center">
+      <caption>Users list:</caption>
+      <b-thead head-variant="dark">
+          <b-tr>
+            <b-th>Id</b-th>
+            <b-th>First name</b-th>
+            <b-th>Last name</b-th>
+            <b-th>Email</b-th>
+            <b-th>Gender</b-th>
+            <b-th>Ip address</b-th>
+            <b-th>Total clicks</b-th>
+            <b-th>Total page views</b-th>
+          </b-tr>
+      </b-thead>
       <tr v-for="user in usersList" :key="user.id">
         <td><router-link :to="{name:'user_detail',params:{id:user.id}}">{{ user.id }}</router-link></td>
         <td>{{ user.first_name }}</td>
@@ -16,7 +39,7 @@
         <td>{{ user.total_clicks }}</td>
         <td>{{ user.total_page_views }}</td>
       </tr>
-    </table>
+    </b-table-simple>
   </div>
 </template>
 
@@ -42,11 +65,12 @@ export default {
         }
       })
       .then(response => (
-        this.usersList = response.data.data,
+        console.log(response.data),
+        this.usersList = response.data.results,
         this.nexPageNumber = 2,
         this.prevPageNumber = null,
         this.pageNumber = 1,
-        this.maxPages = Math.ceil(response.data.count_users / this.countUsers)
+        this.maxPages = Math.ceil(response.data.count / this.countUsers)
       ));
   },
   methods: {
@@ -67,8 +91,9 @@ export default {
           }
         })
         .then(response => (
-          this.usersList = response.data.data,
-          this.maxPages = Math.ceil(response.data.count_users / this.countUsers)
+            console.log(response),
+          this.usersList = response.data.results,
+          this.maxPages = Math.ceil(response.data.count / this.countUsers)
       ));
     },
     getUsersInput() {
@@ -89,8 +114,9 @@ export default {
           }
         })
         .then(response => (
-          this.usersList = response.data.data,
-          this.maxPages = Math.ceil(response.data.count_users / this.countUsers)
+        console.log(response),
+          this.usersList = response.data.results,
+          this.maxPages = Math.ceil(response.data.count / this.countUsers)
       ));
     }
   }

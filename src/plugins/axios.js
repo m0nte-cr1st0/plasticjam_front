@@ -3,7 +3,7 @@ import ax from 'axios'
 export const axios = ax
 
 export default {
-    install (Vue, options) {
+    install (Vue) {
         Vue.prototype.$axios = ax
     }
 }
