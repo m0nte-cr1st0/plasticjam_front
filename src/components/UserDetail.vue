@@ -1,5 +1,11 @@
 <template>
   <div class="container-fluid">
+  <line-chart
+    :chart-data="chartdata"
+    :hight="100"
+    :options="options"
+    v-if="show"
+  ></line-chart>
     <b-row>
       <b-form-group class="col-md-9">
         <div class="col-md-3">
@@ -16,38 +22,47 @@
         <router-link :to="{name:'users-list'}">Home page</router-link>
       </b-form-group>
     </b-row>
-
-    <b-table-simple hover small caption-top responsive class="text-center">
-      <caption>{{ user.first_name }} {{ user.last_name }} statistic:</caption>
-      <b-thead head-variant="dark">
-          <b-tr>
-            <b-th>Date</b-th>
-            <b-th>Clicks</b-th>
-            <b-th>Page views</b-th>
-          </b-tr>
-      </b-thead>
-      <tr v-for="stat in data.results" :key="stat.id">
-        <td>{{ stat.date }}</td>
-        <td>{{ stat.clicks }}</td>
-        <td>{{ stat.page_views }}</td>
-      </tr>
-    </b-table-simple>
   </div>
 </template>
 
 <script>
+import LineChart from './LineChart.js'
 export default {
     name: 'UserDetail',
+    components: {
+      LineChart
+    },
     data() {
         return {
           user: '',
-          data: {},
           start_date: '',
-          end_date: ''
+          end_date: '',
+          stat_data: '',
+          chartdata: {
+            labels: [],
+            datasets: [
+              {
+                label: 'Clicks',
+                backgroundColor: '#f87979',
+                data: []
+              },
+              {
+                label: 'Page wiews',
+                backgroundColor: '#f879',
+                data: []
+              }
+            ]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: true
+          },
+          show: ''
         }
     },
     created () {
       document.title = 'Detail statistic page';
+      this.show = false;
     },
     mounted() {
         let id = this.$route.params.id;
@@ -58,27 +73,41 @@ export default {
               }
             })
             .then(response => {
-              this.data = response.data,
-              this.user = response.data.results[0].user,
-              this.start_date = response.data.results.min_date,
-              this.end_date = response.data.results.max_date
+              this.stat_data = response.data;
+              this.user = response.data.results[0].user;
+              this.start_date = response.data.results.min_date;
+              this.end_date = response.data.results.max_date;
+              for (let res of response.data.results) {
+                  this.chartdata.datasets[0].data.push(res.clicks);
+                  this.chartdata.datasets[1].data.push(res.page_views);
+                  this.chartdata.labels.push(res.date);
+              }
+              this.show = true;
         })
     },
     methods: {
-        getStatistics() {
+      getStatistics() {
+          this.show = false;
           let id = this.$route.params.id;
-          this.$axios
-            .get(id+'/', {
+          this.$axios.get(id+'/', {
               params: {
-               'user_pk': id,
-               'start_date': this.start_date,
-               'end_date': this.end_date
+                  'user_pk': id,
+                  'start_date': this.start_date,
+                  'end_date': this.end_date
               }
-            })
-            .then(response => (
-              this.data = response.data
-            ));
-        }
+          }).then(response => {
+              this.stat_data = response.data;
+              this.chartdata.datasets[0].data = [];
+              this.chartdata.datasets[1].data = [];
+              this.chartdata.labels = [];
+              for (let res of response.data.results) {
+                  this.chartdata.datasets[0].data.push(res.clicks);
+                  this.chartdata.datasets[1].data.push(res.page_views);
+                  this.chartdata.labels.push(res.date);
+              }
+              this.show = true
+          });
+      }
     }
 };
 </script>

@@ -144,6 +144,7 @@ export default {
           }
         })
         .then(response => (
+          console.log(233),
           this.usersList = response.data.results,
           this.maxPages = Math.ceil(response.data.count / this.countUsers)
       ));
