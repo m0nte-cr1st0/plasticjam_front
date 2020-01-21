@@ -2,7 +2,7 @@
   <div class="container-fluid">
   <line-chart
     :chart-data="chartdata"
-    :hight="100"
+    :hight="50"
     :options="options"
     v-if="show"
   ></line-chart>
